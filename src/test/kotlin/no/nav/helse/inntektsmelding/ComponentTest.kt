@@ -66,7 +66,7 @@ class ComponentTest {
 
     @AfterEach
     fun `clear prometheus registry`() {
-//        spinntektsmelding.stop()
+        spinntektsmelding.stop()
         CollectorRegistry.defaultRegistry.clear()
     }
 
@@ -77,18 +77,7 @@ class ComponentTest {
         val record = ExternalAttachment(getFileAsString("src/test/resources/inntektsskjema.xml"), "4936", "1", "anArchiveReference", "aCallId")
         produceOneMessage(record)
 
-//        val resultConsumer = KafkaConsumer<String, GenericData>(consumerProperties())
-//        resultConsumer.subscribe(listOf(altinnMottakTopic.name))
-//        val consumerRecords = resultConsumer.poll(Duration.ofSeconds(10))
-//
-//        assertEquals(1, consumerRecords.count())
-//
-//        val msgRead = consumerRecords.records(altinnMottakTopic.name).first().value()
-//        msgRead.keySet().forEach { propName ->
-//            assertEquals(msgSent[propName], msgRead[propName])
-//        }
-
-        Thread.sleep(10000L)
+        Thread.sleep(5000L)
     }
 
     private fun producerProperties(): Properties {

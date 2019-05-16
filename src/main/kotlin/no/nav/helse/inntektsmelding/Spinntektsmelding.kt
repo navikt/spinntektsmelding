@@ -10,10 +10,11 @@ import org.apache.kafka.clients.consumer.ConsumerConfig.*
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.config.SaslConfigs
 import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.errors.WakeupException
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
 import java.time.Duration
-import java.util.*
+import java.util.Properties
 
 const val altinnMottakTopicName = "aapen-altinn-dokmot-Mottatt"
 const val inntektsmeldingServiceCode = "4936"
@@ -54,22 +55,39 @@ class Spinntektsmelding(env: Environment = Environment()) {
     private val consumer: Consumer<String, ExternalAttachment> = KafkaConsumer<String, ExternalAttachment>(consumerProperties)
 
     fun start() {
+        addShutdownHook()
         consumer.subscribe(listOf(altinnMottakTopicName))
 
         logger.info("Consuming topic $altinnMottakTopicName ")
 
-        while (true) {
-            val consumerRecords = consumer.poll(Duration.ofSeconds(1))
-            logger.info("Received ${consumerRecords.count()} records")
+        try {
+            while (true) {
+                val consumerRecords = consumer.poll(Duration.ofSeconds(1))
+                logger.info("Received ${consumerRecords.count()} records")
 
-            consumerRecords.forEach { record ->
-                logger.info("Prosesserer kafka record")
-                val externalAttachment = record.value()
-                if (externalAttachment.getServiceCode() == inntektsmeldingServiceCode && externalAttachment.getServiceEditionCode() == "1"){
-                    logger.info("Fikk " + unwrapInntektsMelding(externalAttachment))
+                consumerRecords.forEach { record ->
+                    logger.info("Prosesserer kafka record")
+                    val externalAttachment = record.value()
+                    if (externalAttachment.getServiceCode() == inntektsmeldingServiceCode && externalAttachment.getServiceEditionCode() == "1") {
+                        logger.info("Fikk " + unwrapInntektsMelding(externalAttachment))
+                    }
                 }
             }
+        } catch (exception: WakeupException) {
+            // do nothing we are shutting down
+        } finally {
+            consumer.close()
         }
+    }
+
+    fun stop() {
+        consumer.wakeup()
+    }
+
+    private fun addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            this.stop()
+        })
     }
 }
 
