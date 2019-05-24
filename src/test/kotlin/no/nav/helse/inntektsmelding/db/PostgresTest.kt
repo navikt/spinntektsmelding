@@ -5,7 +5,31 @@ import org.junit.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import kotlin.test.assertEquals
 
-internal class PostgresTest {
+
+// Starter postgres i en container, slik at vi har en database å teste mot.
+//
+// Dette forutsetter at Docker-daemon kjører på maskinen. Ask me how I know...
+// Løsning: https://stackoverflow.com/questions/44084846/cannot-connect-to-the-docker-daemon-on-macos
+private object PostgresContainer {
+    val instance by lazy {
+        PostgreSQLContainer<Nothing>("postgres:11.2").apply {
+            start()
+        }
+    }
+}
+
+private object DataSource {
+    val instance: HikariDataSource by lazy {
+        HikariDataSource().apply {
+            username = PostgresContainer.instance.username
+            password = PostgresContainer.instance.password
+            jdbcUrl = PostgresContainer.instance.jdbcUrl
+            connectionTimeout = 1000L
+        }
+    }
+}
+
+class PostgresTest {
 
     @Test
     fun `Migration scripts are applied successfully`() {
@@ -29,23 +53,5 @@ internal class PostgresTest {
 
 private fun withCleanDb(test: () -> Unit) = DataSource.instance.also { clean(it) }.run { test() }
 
-// Denne testen krever at Docker-daemon kjører på maskinen. Ask me how I know...
-// Løsning: https://stackoverflow.com/questions/44084846/cannot-connect-to-the-docker-daemon-on-macos
-private object PostgresContainer {
-    val instance by lazy {
-        PostgreSQLContainer<Nothing>("postgres:11.2").apply {
-            start()
-        }
-    }
-}
 
-private object DataSource {
-    val instance: HikariDataSource by lazy {
-        HikariDataSource().apply {
-            username = PostgresContainer.instance.username
-            password = PostgresContainer.instance.password
-            jdbcUrl = PostgresContainer.instance.jdbcUrl
-            connectionTimeout = 1000L
-        }
-    }
-}
+
