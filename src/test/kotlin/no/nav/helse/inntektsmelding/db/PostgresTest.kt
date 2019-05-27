@@ -40,7 +40,7 @@ class PostgresTest {
     }
 
     @Test
-    fun `Migration scripts are idempotent`() {
+    fun `Migration scripts run once`() {
         withCleanDb {
             migrate(DataSource.instance)
 
