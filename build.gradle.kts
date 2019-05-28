@@ -17,37 +17,49 @@ application {
     mainClassName = "no.nav.helse.AppKt"
 }
 
+val prometheusVersion = "0.5.0"
+val flywayVersion = "6.0.0-beta"
+val hikariVersion = "3.3.1"
+val postgresVersion = "42.2.5"
+val junitJupiterVersion = "5.3.1"
+val testcontainers_version = "1.10.6"
+
 dependencies {
-    compile(kotlin("stdlib"))
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.2")
+    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.30.2")
 
     // Logging
-    compile("ch.qos.logback:logback-classic:1.2.3")
-    compile("net.logstash.logback:logstash-logback-encoder:5.2")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("net.logstash.logback:logstash-logback-encoder:5.2")
 
     // Metrikker
-    val prometheusVersion = "0.5.0"
-    compile("io.prometheus:simpleclient_hotspot:$prometheusVersion")
-    compile( "io.prometheus:simpleclient_common:$prometheusVersion")
+    implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
+    implementation( "io.prometheus:simpleclient_common:$prometheusVersion")
 
     // XML
-    compile("javax.xml.bind:jaxb-api:2.1")
-    compile("org.glassfish.jaxb:jaxb-runtime:2.3.0.1")
+    implementation("javax.xml.bind:jaxb-api:2.1")
+    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.0.1")
 
     // Kafka
-    compile("org.apache.kafka:kafka-clients:2.0.1")
-    compile("io.confluent:kafka-avro-serializer:5.0.0")
-    compile("no.nav.altinnkanal:altinnkanal-schemas:1.0.1")
+    implementation("org.apache.kafka:kafka-clients:2.0.1")
+    implementation("io.confluent:kafka-avro-serializer:5.0.0")
+    implementation("no.nav.altinnkanal:altinnkanal-schemas:1.0.1")
 
     // HTTP-klient
-    compile("com.github.kittinunf.fuel:fuel:1.15.1")
+    implementation("com.github.kittinunf.fuel:fuel:1.15.1")
+
+    // Database
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
 
     // Test
-    val junitJupiterVersion = "5.3.1"
-    testCompile("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testCompile("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testCompile ("no.nav:kafka-embedded-env:2.1.1")
+    testImplementation ("no.nav:kafka-embedded-env:2.1.1")
+    testImplementation("org.testcontainers:postgresql:$testcontainers_version")
 }
 
 repositories {
