@@ -8,6 +8,8 @@ private val log = LoggerFactory.getLogger(appName)
 fun main() {
     log.info("Starting $appName")
 
+
+
     Spinntektsmelding().start()
 }
 

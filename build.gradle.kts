@@ -21,6 +21,7 @@ val prometheusVersion = "0.5.0"
 val flywayVersion = "6.0.0-beta"
 val hikariVersion = "3.3.1"
 val postgresVersion = "42.2.5"
+val kotliqueryVersion = "1.3.0"
 val junitJupiterVersion = "5.3.1"
 val testcontainers_version = "1.10.6"
 
@@ -52,6 +53,8 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
+    implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:8.2.0")
+    implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
     // Test
     testImplementation(kotlin("test"))
