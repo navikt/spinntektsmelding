@@ -69,7 +69,8 @@ class Spinntektsmelding(env: Environment = Environment()) {
                     logger.info("Prosesserer kafka record")
                     val externalAttachment = record.value()
                     if (externalAttachment.getServiceCode() == inntektsmeldingServiceCode && externalAttachment.getServiceEditionCode() == "1") {
-                        logger.info("Fikk " + unwrapInntektsMelding(externalAttachment))
+                        val inntektsMelding = unwrapInntektsMelding(externalAttachment)
+                        // TODO Lagre inntektsmeldingen
                     }
                 }
             }

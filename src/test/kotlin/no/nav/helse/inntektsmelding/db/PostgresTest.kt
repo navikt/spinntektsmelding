@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.junit.Test
 import org.testcontainers.containers.PostgreSQLContainer
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 
 // Starter postgres i en container, slik at vi har en database å teste mot.
@@ -28,8 +29,7 @@ private object DataSource {
         }
     }
 }
-
-class PostgresTest {
+internal class PostgresTest {
 
     @Test
     fun `Migration scripts are applied successfully`() {
@@ -51,7 +51,37 @@ class PostgresTest {
 
 }
 
+internal class PostgresInntektStoreTest {
+    @Test
+    fun `Successful insert and read of inntektsmelding`() {
+        withMigratedDb {
+            with(InntektsmeldingStore(DataSource.instance)) {
+
+                val arbeidsgiverVirksomhetsnummer = "1"
+                val brukerFnr = "2"
+                val arbeidsforholdId = "3"
+                val inntektsmeldingXml = "4"
+                val xmlVersjon = "5"
+
+                val storedInntektsMelding = insertInntektsmelding(arbeidsgiverVirksomhetsnummer, brukerFnr, arbeidsforholdId, inntektsmeldingXml, xmlVersjon)
+
+                assertNotNull(storedInntektsMelding.inntektsmeldingId)
+                assertEquals(arbeidsgiverVirksomhetsnummer, storedInntektsMelding.arbeidsgiverVirksomhetsnummer)
+                assertEquals(brukerFnr, storedInntektsMelding.brukerFnr)
+                assertEquals(arbeidsforholdId, storedInntektsMelding.arbeidsforholdId)
+                assertEquals(inntektsmeldingXml, storedInntektsMelding.inntektsmeldingXml)
+                assertEquals(xmlVersjon, storedInntektsMelding.xmlVersjon)
+
+                val storedInntektsMeldingById = getInntektsmelding(storedInntektsMelding.inntektsmeldingId)
+                assertEquals(storedInntektsMelding, storedInntektsMeldingById)
+            }
+        }
+    }
+}
+
 private fun withCleanDb(test: () -> Unit) = DataSource.instance.also { clean(it) }.run { test() }
+
+private fun withMigratedDb(test: () -> Unit) = DataSource.instance.also { clean(it) }.also { migrate(it) }.run { test() }
 
 
 
