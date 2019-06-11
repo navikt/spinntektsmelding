@@ -70,7 +70,7 @@ class Spinntektsmelding(env: Environment = Environment()) {
                     val externalAttachment = record.value()
                     if (externalAttachment.getServiceCode() == inntektsmeldingServiceCode && externalAttachment.getServiceEditionCode() == "1") {
                         val inntektsMelding = unwrapInntektsMelding(externalAttachment)
-                        logger.info("Fikk " + inntektsMelding)
+                        // TODO Lagre inntektsmeldingen
                     }
                 }
             }
